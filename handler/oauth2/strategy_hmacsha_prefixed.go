@@ -5,10 +5,10 @@ package oauth2
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	enigma "github.com/ory/fosite/token/hmac"
+	"github.com/ory/fosite/xpass"
 
 	"github.com/ory/fosite"
 )
@@ -29,7 +29,7 @@ func NewHMACSHAStrategy(
 }
 
 func (h *HMACSHAStrategy) getPrefix(part string) string {
-	return fmt.Sprintf("ory_%s_", part)
+	return part
 }
 
 func (h *HMACSHAStrategy) trimPrefix(token, part string) string {
@@ -45,27 +45,27 @@ func (h *HMACSHAStrategy) setPrefix(token, part string) string {
 
 func (h *HMACSHAStrategy) GenerateAccessToken(ctx context.Context, r fosite.Requester) (token string, signature string, err error) {
 	token, sig, err := h.HMACSHAStrategyUnPrefixed.GenerateAccessToken(ctx, r)
-	return h.setPrefix(token, "at"), sig, err
+	return h.setPrefix(token, xpass.GetSymbol(xpass.SymbolAT)), sig, err
 }
 
 func (h *HMACSHAStrategy) ValidateAccessToken(ctx context.Context, r fosite.Requester, token string) (err error) {
-	return h.HMACSHAStrategyUnPrefixed.ValidateAccessToken(ctx, r, h.trimPrefix(token, "at"))
+	return h.HMACSHAStrategyUnPrefixed.ValidateAccessToken(ctx, r, h.trimPrefix(token, xpass.GetSymbol(xpass.SymbolAT)))
 }
 
 func (h *HMACSHAStrategy) GenerateRefreshToken(ctx context.Context, r fosite.Requester) (token string, signature string, err error) {
 	token, sig, err := h.HMACSHAStrategyUnPrefixed.GenerateRefreshToken(ctx, r)
-	return h.setPrefix(token, "rt"), sig, err
+	return h.setPrefix(token, xpass.GetSymbol(xpass.SymbolRT)), sig, err
 }
 
 func (h *HMACSHAStrategy) ValidateRefreshToken(ctx context.Context, r fosite.Requester, token string) (err error) {
-	return h.HMACSHAStrategyUnPrefixed.ValidateRefreshToken(ctx, r, h.trimPrefix(token, "rt"))
+	return h.HMACSHAStrategyUnPrefixed.ValidateRefreshToken(ctx, r, h.trimPrefix(token, xpass.GetSymbol(xpass.SymbolRT)))
 }
 
 func (h *HMACSHAStrategy) GenerateAuthorizeCode(ctx context.Context, r fosite.Requester) (token string, signature string, err error) {
 	token, sig, err := h.HMACSHAStrategyUnPrefixed.GenerateAuthorizeCode(ctx, r)
-	return h.setPrefix(token, "ac"), sig, err
+	return h.setPrefix(token, xpass.GetSymbol(xpass.SymbolAC)), sig, err
 }
 
 func (h *HMACSHAStrategy) ValidateAuthorizeCode(ctx context.Context, r fosite.Requester, token string) (err error) {
-	return h.HMACSHAStrategyUnPrefixed.ValidateAuthorizeCode(ctx, r, h.trimPrefix(token, "ac"))
+	return h.HMACSHAStrategyUnPrefixed.ValidateAuthorizeCode(ctx, r, h.trimPrefix(token, xpass.GetSymbol(xpass.SymbolAC)))
 }
